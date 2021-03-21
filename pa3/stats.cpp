@@ -45,29 +45,93 @@ for (unsigned int y = 0; y < im.height(); y++) {
 long stats::getSum(char channel, pair<int,int> ul, int w, int h){
 /* Your code here!! */
     if (channel == 'r') {
-        return sumRed[ul.first + w - 1][ul.second + h - 1] - sumRed[ul.first + w - 1][ul.second] - sumRed[ul.first][ul.second + h - 1] + sumRed[ul.first][ul.second]; 
+        if (ul.second + h - 1 < 0 && ul.first + w - 1 < 0) {
+            return sumRed[ul.first][ul.second];
+        }
+        else if (ul.second + h - 1 < 0) {
+            return 0 - sumRed[ul.first + w - 1][ul.second] - 0 + sumRed[ul.first][ul.second];
+        }
+        else if (ul.first + w - 1 < 0) {
+            return 0 - 0 - sumRed[ul.first][ul.second + h - 1] + sumRed[ul.first][ul.second];
+        }
+        else {
+            return sumRed[ul.first + w - 1][ul.second + h - 1] - sumRed[ul.first + w - 1][ul.second] - sumRed[ul.first][ul.second + h - 1] + sumRed[ul.first][ul.second];
+        } 
     }
     else if (channel == 'g') {
-        return sumGreen[ul.first + w - 1][ul.second + h - 1] - sumGreen[ul.first + w - 1][ul.second] - sumGreen[ul.first][ul.second + h - 1] + sumGreen[ul.first][ul.second]; 
+        if (ul.second + h - 1 < 0 && ul.first + w - 1 < 0) {
+            return sumGreen[ul.first][ul.second];
+        }
+        else if (ul.second + h - 1 < 0) {
+            return 0 - sumGreen[ul.first + w - 1][ul.second] - 0 + sumGreen[ul.first][ul.second];
+        }
+        else if (ul.first + w - 1 < 0) {
+            return 0 - 0 - sumGreen[ul.first][ul.second + h - 1] + sumGreen[ul.first][ul.second];
+        }
+        else {
+            return sumGreen[ul.first + w - 1][ul.second + h - 1] - sumGreen[ul.first + w - 1][ul.second] - sumGreen[ul.first][ul.second + h - 1] + sumGreen[ul.first][ul.second];
+        }
     }
     else {
-        return sumBlue[ul.first + w - 1][ul.second + h - 1] - sumBlue[ul.first + w - 1][ul.second] - sumBlue[ul.first][ul.second + h - 1] + sumBlue[ul.first][ul.second];
+        if (ul.second + h - 1 < 0 && ul.first + w - 1 < 0) {
+            return sumBlue[ul.first][ul.second];
+        }
+        else if (ul.second + h - 1 < 0) {
+            return 0 - sumBlue[ul.first + w - 1][ul.second] - 0 + sumBlue[ul.first][ul.second];
+        }
+        else if (ul.first + w - 1 < 0) {
+            return 0 - 0 - sumBlue[ul.first][ul.second + h - 1] + sumBlue[ul.first][ul.second];
+        }
+        else {
+            return sumBlue[ul.first + w - 1][ul.second + h - 1] - sumBlue[ul.first + w - 1][ul.second] - sumBlue[ul.first][ul.second + h - 1] + sumBlue[ul.first][ul.second];
+        }
     }
-
 }
 
 long stats::getSumSq(char channel, pair<int,int> ul, int w, int h){
 /* Your code here!! */
     if (channel == 'r') {
-        return sumsqRed[ul.first + w - 1][ul.second + h - 1] - sumsqRed[ul.first + w - 1][ul.second] - sumsqRed[ul.first][ul.second + h - 1] + sumsqRed[ul.first][ul.second]; 
+        if (ul.second + h - 1 < 0 && ul.first + w - 1 < 0) {
+            return sumsqRed[ul.first][ul.second];
+        }
+        else if (ul.second + h - 1 < 0) {
+            return 0 - sumsqRed[ul.first + w - 1][ul.second] - 0 + sumsqRed[ul.first][ul.second];
+        }
+        else if (ul.first + w - 1 < 0) {
+            return 0 - 0 - sumsqRed[ul.first][ul.second + h - 1] + sumsqRed[ul.first][ul.second];
+        }
+        else {
+            return sumsqRed[ul.first + w - 1][ul.second + h - 1] - sumsqRed[ul.first + w - 1][ul.second] - sumsqRed[ul.first][ul.second + h - 1] + sumsqRed[ul.first][ul.second];
+        } 
     }
     else if (channel == 'g') {
-        return sumsqGreen[ul.first + w - 1][ul.second + h - 1] - sumsqGreen[ul.first + w - 1][ul.second] - sumsqGreen[ul.first][ul.second + h - 1] + sumsqGreen[ul.first][ul.second]; 
+        if (ul.second + h - 1 < 0 && ul.first + w - 1 < 0) {
+            return sumsqGreen[ul.first][ul.second];
+        }
+        else if (ul.second + h - 1 < 0) {
+            return 0 - sumsqGreen[ul.first + w - 1][ul.second] - 0 + sumsqGreen[ul.first][ul.second];
+        }
+        else if (ul.first + w - 1 < 0) {
+            return 0 - 0 - sumsqGreen[ul.first][ul.second + h - 1] + sumsqGreen[ul.first][ul.second];
+        }
+        else {
+            return sumsqGreen[ul.first + w - 1][ul.second + h - 1] - sumsqGreen[ul.first + w - 1][ul.second] - sumsqGreen[ul.first][ul.second + h - 1] + sumsqGreen[ul.first][ul.second];
+        }
     }
     else {
-        return sumsqBlue[ul.first + w - 1][ul.second + h - 1] - sumsqBlue[ul.first + w - 1][ul.second] - sumsqBlue[ul.first][ul.second + h - 1] + sumsqBlue[ul.first][ul.second];
+        if (ul.second + h - 1 < 0 && ul.first + w - 1 < 0) {
+            return sumsqBlue[ul.first][ul.second];
+        }
+        else if (ul.second + h - 1 < 0) {
+            return 0 - sumsqBlue[ul.first + w - 1][ul.second] - 0 + sumsqBlue[ul.first][ul.second];
+        }
+        else if (ul.first + w - 1 < 0) {
+            return 0 - 0 - sumsqBlue[ul.first][ul.second + h - 1] + sumsqBlue[ul.first][ul.second];
+        }
+        else {
+            return sumsqBlue[ul.first + w - 1][ul.second + h - 1] - sumsqBlue[ul.first + w - 1][ul.second] - sumsqBlue[ul.first][ul.second + h - 1] + sumsqBlue[ul.first][ul.second];
+        }
     }
-
 }
 
 // given a rectangle, compute its sum of squared deviations from mean, over all color channels.
