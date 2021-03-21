@@ -3,16 +3,23 @@
 
 stats::stats(PNG & im){
 
-/* Your code here!! */
+    /* Your code here!! */
 
-for (unsigned int x = 0; x < im.width(); x++) {
-    for (unsigned int y = 0; y < im.height(); y++) {
-        int sumR = 0;
-        int sumG = 0;
-        int sumB = 0;
-        int sumRsq = 0;
-        int sumGsq = 0;
-        int sumBsq = 0;    
+  sumRed = vector<vector<long>>(im.height(), vector<long> (im.width()));
+  sumGreen = vector<vector<long>>(im.height(), vector<long> (im.width()));
+  sumBlue = vector<vector<long>>(im.height(), vector<long> (im.width()));
+  sumsqRed = vector<vector<long>>(im.height(), vector<long> (im.width()));
+  sumsqGreen = vector<vector<long>>(im.height(), vector<long> (im.width()));
+  sumsqBlue = vector<vector<long>>(im.height(), vector<long> (im.width()));
+
+for (unsigned int y = 0; y < im.height(); y++) {
+    for (unsigned int x = 0; x < im.width(); x++) {
+        long sumR = 0;
+        long sumG = 0;
+        long sumB = 0;
+        long sumRsq = 0;
+        long sumGsq = 0;
+        long sumBsq = 0;    
         for (unsigned int i = 0; i <= x; i++) {
             for (unsigned int j = 0; j <= y; j++) {
                 sumR += im.getPixel(i,j)->r;
@@ -23,12 +30,12 @@ for (unsigned int x = 0; x < im.width(); x++) {
                 sumBsq += im.getPixel(i,j)->b * im.getPixel(i,j)->b;
             }
         }
-        sumRed[x][y] = sumR;
-        sumGreen[x][y] = sumG;
-        sumBlue[x][y] = sumB;
-        sumsqRed[x][y] = sumRsq;
-        sumsqGreen[x][y] = sumGsq;
-        sumsqBlue[x][y] = sumBsq;
+        sumRed[y][x] = sumR;
+        sumGreen[y][x] = sumG;
+        sumBlue[y][x] = sumB;
+        sumsqRed[y][x] = sumRsq;
+        sumsqGreen[y][x] = sumGsq;
+        sumsqBlue[y][x] = sumBsq;
     }
 }
 
@@ -82,6 +89,8 @@ RGBAPixel stats::getAvg(pair<int,int> ul, int w, int h){
   long avgG = getSum('g', ul, w, h)/ (w * h);
   long avgB = getSum('b', ul, w, h)/ (w * h);
 
-  return RGBAPixel(avgR, avgG, avgB);
+  RGBAPixel pixel = RGBAPixel(avgR, avgG, avgB);
+
+  return pixel;
 
 }
