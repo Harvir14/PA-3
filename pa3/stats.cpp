@@ -158,9 +158,9 @@ long stats::getSumSq(char channel, pair<int,int> ul, int w, int h){
 // see written specification for a description of this function.
 double stats::getVar(pair<int,int> ul, int w, int h){
 /* Your code here!! */
-    long varR = getSumSq('r', ul, w, h) - (getSumSq('r', ul, w, h) / (w * h)); 
-    long varG = getSumSq('g', ul, w, h) - (getSumSq('g', ul, w, h) / (w * h)); 
-    long varB = getSumSq('b', ul, w, h) - (getSumSq('b', ul, w, h) / (w * h)); 
+    long varR = getSumSq('r', ul, w, h) - ((getSum('r', ul, w, h) * getSum('r', ul, w, h)) / (w * h)); 
+    long varG = getSumSq('g', ul, w, h) - ((getSum('g', ul, w, h) * getSum('g', ul, w, h)) / (w * h)); 
+    long varB = getSumSq('b', ul, w, h) - ((getSum('b', ul, w, h) * getSum('b', ul, w, h)) / (w * h)); 
     return (double)(varR + varG + varB);
 
 
