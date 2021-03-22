@@ -12,23 +12,43 @@ stats::stats(PNG & im){
   sumsqGreen = vector<vector<long>>(im.height(), vector<long> (im.width()));
   sumsqBlue = vector<vector<long>>(im.height(), vector<long> (im.width()));
 
+  long sumR, sumG, sumB, sumRsq, sumGsq, sumBsq;
+
 for (unsigned int y = 0; y < im.height(); y++) {
     for (unsigned int x = 0; x < im.width(); x++) {
-        long sumR = 0;
-        long sumG = 0;
-        long sumB = 0;
-        long sumRsq = 0;
-        long sumGsq = 0;
-        long sumBsq = 0;    
-        for (unsigned int i = 0; i <= x; i++) {
-            for (unsigned int j = 0; j <= y; j++) {
-                sumR += im.getPixel(i,j)->r;
-                sumG += im.getPixel(i,j)->g;
-                sumB += im.getPixel(i,j)->b;
-                sumRsq += im.getPixel(i,j)->r * im.getPixel(i,j)->r;
-                sumGsq += im.getPixel(i,j)->g * im.getPixel(i,j)->g;
-                sumBsq += im.getPixel(i,j)->b * im.getPixel(i,j)->b;
-            }
+        if (x == 0 && y == 0) {
+            sumR = (long)im.getPixel(x,y)->r;
+            sumG = (long)im.getPixel(x,y)->g;
+            sumB = (long)im.getPixel(x,y)->b;
+            sumRsq = (long)im.getPixel(x,y)->r * (long)im.getPixel(x,y)->r;
+            sumGsq = (long)im.getPixel(x,y)->g * (long)im.getPixel(x,y)->g;
+            sumBsq = (long)im.getPixel(x,y)->b * (long)im.getPixel(x,y)->b;
+        }
+        else if (x == 0) {
+            sumR = (long)im.getPixel(x,y)->r + sumRed[y-1][x];
+            sumG = (long)im.getPixel(x,y)->g + sumGreen[y-1][x];
+            sumB = (long)im.getPixel(x,y)->b + sumBlue[y-1][x];
+            sumRsq = (long)im.getPixel(x,y)->r * (long)im.getPixel(x,y)->r + sumsqRed[y-1][x];
+            sumGsq = (long)im.getPixel(x,y)->g * (long)im.getPixel(x,y)->g + sumsqGreen[y-1][x];
+            sumBsq = (long)im.getPixel(x,y)->b * (long)im.getPixel(x,y)->b + sumsqBlue[y-1][x];
+
+        }
+        else if (y == 0) {
+            sumR = (long)im.getPixel(x,y)->r + sumRed[y][x-1];
+            sumG = (long)im.getPixel(x,y)->g + sumGreen[y][x-1];
+            sumB = (long)im.getPixel(x,y)->b + sumBlue[y][x-1];
+            sumRsq = (long)im.getPixel(x,y)->r * (long)im.getPixel(x,y)->r + sumsqRed[y][x-1];
+            sumGsq = (long)im.getPixel(x,y)->g * (long)im.getPixel(x,y)->g + sumsqGreen[y][x-1];
+            sumBsq = (long)im.getPixel(x,y)->b * (long)im.getPixel(x,y)->b + sumsqBlue[y][x-1];
+        } 
+        else {
+            sumR = (long)im.getPixel(x,y)->r + sumRed[y][x-1] + sumRed[y-1][x] - sumRed[y-1][x-1];
+            sumG = (long)im.getPixel(x,y)->g + sumGreen[y][x-1] + sumGreen[y-1][x] - sumGreen[y-1][x-1];
+            sumB = (long)im.getPixel(x,y)->b + sumBlue[y][x-1] + sumBlue[y-1][x] - sumBlue[y-1][x-1];
+            sumRsq = (long)im.getPixel(x,y)->r * (long)im.getPixel(x,y)->r + sumsqRed[y][x-1] + sumsqRed[y-1][x] - sumsqRed[y-1][x-1];
+            sumGsq = (long)im.getPixel(x,y)->g * (long)im.getPixel(x,y)->g + sumsqGreen[y][x-1] + sumsqGreen[y-1][x] - sumsqGreen[y-1][x-1];
+            sumBsq = (long)im.getPixel(x,y)->b * (long)im.getPixel(x,y)->b + sumsqBlue[y][x-1] + sumsqBlue[y-1][x] - sumsqBlue[y-1][x-1];
+
         }
         sumRed[y][x] = sumR;
         sumGreen[y][x] = sumG;
@@ -45,92 +65,92 @@ for (unsigned int y = 0; y < im.height(); y++) {
 long stats::getSum(char channel, pair<int,int> ul, int w, int h){
 /* Your code here!! */
     if (channel == 'r') {
-        // if (ul.second + h - 1 < 0 && ul.first + w - 1 < 0) {
-        //     return sumRed[ul.second][ul.first];
-        // }
-        // else if (ul.second + h - 1 < 0) {
-        //     return 0 - sumRed[ul.second][ul.first + w - 1] - 0 + sumRed[ul.second][ul.first];
-        // }
-        // else if (ul.first + w - 1 < 0) {
-        //     return 0 - 0 - sumRed[ul.second + h - 1][ul.first] + sumRed[ul.second][ul.first];
-        // }
-        // else {
-            return sumRed[ul.second + h - 1][ul.first + w - 1] - sumRed[ul.second][ul.first + w - 1] - sumRed[ul.second + h - 1][ul.first] + sumRed[ul.second][ul.first];
-        //} 
+        if (ul.first == 0 && ul.second == 0) {
+            return sumRed[ul.second + h -1][ul.first + w -1];
+        }
+        else if (ul.first == 0) {
+            return 0 - sumRed[ul.second-1][ul.first + w - 1] + sumRed[ul.second + h - 1][ul.first + w - 1];
+        }
+        else if (ul.second == 0) {
+            return 0 - sumRed[ul.second + h - 1][ul.first - 1] + sumRed[ul.second + h - 1][ul.first + w - 1];
+        }
+        else {
+            return sumRed[ul.second + h - 1][ul.first + w - 1] - sumRed[ul.second - 1][ul.first + w - 1] - sumRed[ul.second + h - 1][ul.first - 1] + sumRed[ul.second - 1][ul.first - 1];
+        } 
     }
     else if (channel == 'g') {
-        // if (ul.second + h - 1 < 0 && ul.first + w - 1 < 0) {
-        //     return sumGreen[ul.second][ul.first];
-        // }
-        // else if (ul.second + h - 1 < 0) {
-        //     return 0 - sumGreen[ul.second][ul.first + w - 1] - 0 + sumGreen[ul.second][ul.first];
-        // }
-        // else if (ul.first + w - 1 < 0) {
-        //     return 0 - 0 - sumGreen[ul.second + h - 1][ul.first] + sumGreen[ul.second][ul.first];
-        // }
-        // else {
-            return sumGreen[ul.second + h - 1][ul.first + w - 1] - sumGreen[ul.second][ul.first + w - 1] - sumGreen[ul.second + h - 1][ul.first] + sumGreen[ul.second][ul.first];
-        //}
+        if (ul.first == 0 && ul.second == 0) {
+            return sumGreen[ul.second + h -1][ul.first + w -1];
+        }
+        else if (ul.first == 0) {
+            return 0 - sumGreen[ul.second-1][ul.first + w - 1] + sumGreen[ul.second + h - 1][ul.first + w - 1];
+        }
+        else if (ul.second == 0) {
+            return 0 - sumGreen[ul.second + h - 1][ul.first - 1] + sumGreen[ul.second + h - 1][ul.first + w - 1];
+        }
+        else {
+            return sumGreen[ul.second + h - 1][ul.first + w - 1] - sumGreen[ul.second - 1][ul.first + w - 1] - sumGreen[ul.second + h - 1][ul.first - 1] + sumGreen[ul.second - 1][ul.first - 1];
+        } 
     }
     else {
-        // if (ul.second + h - 1 < 0 && ul.first + w - 1 < 0) {
-        //     return sumBlue[ul.second][ul.first];
-        // }
-        // else if (ul.second + h - 1 < 0) {
-        //     return 0 - sumBlue[ul.second][ul.first + w - 1] - 0 + sumBlue[ul.second][ul.first];
-        // }
-        // else if (ul.first + w - 1 < 0) {
-        //     return 0 - 0 - sumBlue[ul.second + h - 1][ul.first] + sumBlue[ul.second][ul.first];
-        // }
-        // else {
-            return sumBlue[ul.second + h - 1][ul.first + w - 1] - sumBlue[ul.second][ul.first + w - 1] - sumBlue[ul.second + h - 1][ul.first] + sumBlue[ul.second][ul.first];
-        //}
+        if (ul.first == 0 && ul.second == 0) {
+            return sumBlue[ul.second + h -1][ul.first + w -1];
+        }
+        else if (ul.first == 0) {
+            return 0 - sumBlue[ul.second-1][ul.first + w - 1] + sumBlue[ul.second + h - 1][ul.first + w - 1];
+        }
+        else if (ul.second == 0) {
+            return 0 - sumBlue[ul.second + h - 1][ul.first - 1] + sumBlue[ul.second + h - 1][ul.first + w - 1];
+        }
+        else {
+            return sumBlue[ul.second + h - 1][ul.first + w - 1] - sumBlue[ul.second - 1][ul.first + w - 1] - sumBlue[ul.second + h - 1][ul.first - 1] + sumBlue[ul.second - 1][ul.first - 1];
+        } 
     }
 }
 
 long stats::getSumSq(char channel, pair<int,int> ul, int w, int h){
 /* Your code here!! */
     if (channel == 'r') {
-        // if (ul.second + h - 1 < 0 && ul.first + w - 1 < 0) {
-        //     return sumsqRed[ul.second][ul.first];
-        // }
-        // else if (ul.second + h - 1 < 0) {
-        //     return 0 - sumsqRed[ul.second][ul.first + w - 1] - 0 + sumsqRed[ul.second][ul.first];
-        // }
-        // else if (ul.first + w - 1 < 0) {
-        //     return 0 - 0 - sumsqRed[ul.second + h - 1][ul.first] + sumsqRed[ul.second][ul.first];
-        // }
-        // else {
-            return sumsqRed[ul.second + h - 1][ul.first + w - 1] - sumsqRed[ul.second][ul.first + w - 1] - sumsqRed[ul.second + h - 1][ul.first] + sumsqRed[ul.second][ul.first];
-        //} 
+        if (ul.first == 0 && ul.second == 0) {
+            return sumsqRed[ul.second + h -1][ul.first + w -1];
+        }
+        else if (ul.first == 0) {
+            return 0 - sumsqRed[ul.second-1][ul.first + w - 1] + sumsqRed[ul.second + h - 1][ul.first + w - 1];
+        }
+        else if (ul.second == 0) {
+            return 0 - sumsqRed[ul.second + h - 1][ul.first - 1] + sumsqRed[ul.second + h - 1][ul.first + w - 1];
+        }
+        else {
+            return sumsqRed[ul.second + h - 1][ul.first + w - 1] - sumsqRed[ul.second - 1][ul.first + w - 1] - sumsqRed[ul.second + h - 1][ul.first - 1] + sumsqRed[ul.second - 1][ul.first - 1];
+        } 
     }
     else if (channel == 'g') {
-        // if (ul.second + h - 1 < 0 && ul.first + w - 1 < 0) {
-        //     return sumsqGreen[ul.second][ul.first];
-        // }
-        // else if (ul.second + h - 1 < 0) {
-        //     return 0 - sumsqGreen[ul.second][ul.first + w - 1] - 0 + sumsqGreen[ul.second][ul.first];
-        // }
-        // else if (ul.first + w - 1 < 0) {
-        //     return 0 - 0 - sumsqGreen[ul.second + h - 1][ul.first] + sumsqGreen[ul.second][ul.first];
-        // }
-        // else {
-            return sumsqGreen[ul.second + h - 1][ul.first + w - 1] - sumsqGreen[ul.second][ul.first + w - 1] - sumsqGreen[ul.second + h - 1][ul.first] + sumsqGreen[ul.second][ul.first];
-        //}
+        if (ul.first == 0 && ul.second == 0) {
+            return sumsqGreen[ul.second + h -1][ul.first + w -1];
+        }
+        else if (ul.first == 0) {
+            return 0 - sumsqGreen[ul.second-1][ul.first + w - 1] + sumsqGreen[ul.second + h - 1][ul.first + w - 1];
+        }
+        else if (ul.second == 0) {
+            return 0 - sumsqGreen[ul.second + h - 1][ul.first - 1] + sumsqGreen[ul.second + h - 1][ul.first + w - 1];
+        }
+        else {
+            return sumsqGreen[ul.second + h - 1][ul.first + w - 1] - sumsqGreen[ul.second - 1][ul.first + w - 1] - sumsqGreen[ul.second + h - 1][ul.first - 1] + sumsqGreen[ul.second - 1][ul.first - 1];
+        } 
     }
     else {
-        // if (ul.second + h - 1 < 0 && ul.first + w - 1 < 0) {
-        //     return sumsqBlue[ul.second][ul.first];
-        // }
-        // else if (ul.second + h - 1 < 0) {
-        //     return 0 - sumsqBlue[ul.second][ul.first + w - 1] - 0 + sumsqBlue[ul.second][ul.first];
-        // }
-        // else if (ul.first + w - 1 < 0) {
-        //     return 0 - 0 - sumsqBlue[ul.second + h - 1][ul.first] + sumsqBlue[ul.second][ul.first];
-        // }
-        // else {
-            return sumsqBlue[ul.second + h - 1][ul.first + w - 1] - sumsqBlue[ul.second][ul.first + w - 1] - sumsqBlue[ul.second + h - 1][ul.first] + sumsqBlue[ul.second][ul.first];
-        //}
+        if (ul.first == 0 && ul.second == 0) {
+            return sumsqBlue[ul.second + h -1][ul.first + w -1];
+        }
+        else if (ul.first == 0) {
+            return 0 - sumsqBlue[ul.second-1][ul.first + w - 1] + sumsqBlue[ul.second + h - 1][ul.first + w - 1];
+        }
+        else if (ul.second == 0) {
+            return 0 - sumsqBlue[ul.second + h - 1][ul.first - 1] + sumsqBlue[ul.second + h - 1][ul.first + w - 1];
+        }
+        else {
+            return sumsqBlue[ul.second + h - 1][ul.first + w - 1] - sumsqBlue[ul.second - 1][ul.first + w - 1] - sumsqBlue[ul.second + h - 1][ul.first - 1] + sumsqBlue[ul.second - 1][ul.first - 1];
+        } 
     }
 }
 
