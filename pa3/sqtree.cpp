@@ -65,14 +65,55 @@ PNG SQtree::render() {
  * Delete allocated memory.
  */
 void SQtree::clear() {
-  // Your code here.
+  clear(root);
+}
+//helper for clear
+void SQtree::clear((Node * & curr)) {
+  if(curr == NULL) {
+    return;
+    } else {
+      clear(curr->NE);
+	    clear(curr->NW);
+	    clear(curr->SE);
+	    clear(curr->SW);
+	    delete(curr);
+	    curr = NULL;
+      }
+  }
+		  
+void SQtree::copy(const SQtree & other) {
+  root = copy(other.root);
 }
 
-void SQtree::copy(const SQtree & other) {
-  // Your code here.
+void SQtree::copy(const Node * other) {
+  if(other == NULL){
+		return NULL;
+	}
+
+	Node* newNode = new Node(other->upLeft, other->width, other->height, other->avg, other->var);
+	newNode->NE = copy(other->NE);
+	newNode->NW = copy(other->NW);
+	newNode->SE = copy(other->SE);
+	newNode->SW = copy(other->SW);
+	return newNode;
+
 }
 
 int SQtree::size() {
-  // Your code here.
+  size(root);
 }
+
+void SQtree::size((Node * & curr)) {
+  int val = 0;
+  if(curr == NULL) {
+    return val;
+    } else {
+      val ++;
+      val += size(curr->NE);
+	    val += size(curr->NW);
+	    val += size(curr->SE);
+	    val += size(curr->SW);
+      }
+    return val;
+  }
 

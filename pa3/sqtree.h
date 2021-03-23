@@ -140,6 +140,9 @@ class SQtree {
    */
   int size();
 
+  int size(Node * & curr);
+
+
   /* END ================ Public functions (NOT GIVEN) ================ */
 
  private:
@@ -161,6 +164,9 @@ class SQtree {
    */
   void clear();
 
+  void clear(Node * & curr);
+
+
   /**
    * Copies the parameter other SQtree into the current SQtree.
    * Does not free any memory. Called by copy constructor and op=.
@@ -168,6 +174,8 @@ class SQtree {
    * @param other The SQtree to be copied.
    */
   void copy(const SQtree & other);
+
+  void SQtree::copy(const Node * other)
 
   /**
    * Private helper function for the constructor. Recursively builds
