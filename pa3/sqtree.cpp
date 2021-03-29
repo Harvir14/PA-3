@@ -55,6 +55,7 @@ SQtree::SQtree(PNG & imIn, double tol) {
  */
 SQtree::Node * SQtree::buildTree(stats & s, pair<int,int> & ul,
 				 int w, int h, double tol) {
+
   Node* currNode = new Node(ul, w, h, s.getAvg(ul, w, h), s.getVar(ul, w, h));
   double variability = s.getVar(ul, w, h);
   double maxVar;
@@ -166,8 +167,11 @@ SQtree::Node * SQtree::buildTree(stats & s, pair<int,int> & ul,
  * Render SQtree and return the resulting image.
  */
 PNG SQtree::render() {
+  
     PNG renderImg = *(new PNG(root->width, root->height));
     render(root, renderImg);
+    // printf("r: %d g: %d b: %d \n", renderImg.getPixel(5, 5)->r, renderImg.getPixel(5, 5)->b, renderImg.getPixel(5, 5)->g);
+  
     return renderImg;
 }
 
@@ -176,7 +180,7 @@ void SQtree::render(Node * currNode, PNG im) {
    
     if ((currNode->NE==NULL && currNode->NW==NULL) && (currNode->SE==NULL && currNode->SW==NULL)) {
 
-      printf("x: %d y: %d\n", currNode->upLeft.first, currNode->upLeft.second);
+      // printf("x: %d y: %d\n", currNode->upLeft.first, currNode->upLeft.second);
 
       for (int i = 0; i < currNode->width; i++) {
         for(int j = 0; j < currNode->height; j++) {
@@ -198,6 +202,7 @@ void SQtree::render(Node * currNode, PNG im) {
   if (currNode->SE != NULL){
       render(currNode->SE, im);
   }
+  // printf("r: %d g: %d b: %d \n", im.getPixel(5, 5)->r, im.getPixel(5, 5)->b, im.getPixel(5, 5)->g);
 }
 
 /**

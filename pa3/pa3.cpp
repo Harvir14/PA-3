@@ -13,6 +13,8 @@ int main() {
   PNG orig;
   // orig.readFromFile("images/orig/small1.png");
   // orig.readFromFile("images/orig/small2.png");
+    // orig.readFromFile("images/orig/stanley-totem-poles.png");
+
     orig.readFromFile("images/orig/pacman.png");
 
 
@@ -29,7 +31,7 @@ int main() {
   */
   
   // use it to build a sqtree (try other tolerances)
-  SQtree t(orig,10.0);
+  SQtree t(orig,50000.0);
 
 
   // copy the tree (to show you can)
