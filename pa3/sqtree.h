@@ -134,13 +134,15 @@ class SQtree {
    */
   PNG render();
 
+  
+
   /**
    * Return the number of nodes in the tree.
    * You may want a private helper for this.
    */
   int size();
 
-  int size(Node * & curr);
+ 
 
 
   /* END ================ Public functions (NOT GIVEN) ================ */
@@ -164,7 +166,7 @@ class SQtree {
    */
   void clear();
 
-  void clear(Node * & curr);
+
 
 
   /**
@@ -175,7 +177,7 @@ class SQtree {
    */
   void copy(const SQtree & other);
 
-  void SQtree::copy(const Node * other)
+ 
 
   /**
    * Private helper function for the constructor. Recursively builds
@@ -190,8 +192,10 @@ class SQtree {
   /* END ================ Required private functions (NOT GIVEN) ====== */
 
   /* BEGIN ============== Your personal private functions ============= */
-
-
+  Node* copy(const Node * other);
+  void clear(Node * & curr); 
+  int size(Node * & curr);
+  void render(Node * currNode, PNG im);
   /* END ================ Your personal private functions ============= */
 
 };
