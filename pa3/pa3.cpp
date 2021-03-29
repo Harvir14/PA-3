@@ -12,6 +12,9 @@ int main() {
   // read in image
   PNG orig;
   orig.readFromFile("images/orig/small1.png");
+  // orig.readFromFile("images/orig/small2.png");
+
+
   /*
   orig.readFromFile("images/orig/small2.png");
   orig.readFromFile("images/orig/pacman.png");
@@ -26,11 +29,15 @@ int main() {
   // use it to build a sqtree (try other tolerances)
   SQtree t(orig,10.0);
 
+
   // copy the tree (to show you can)
   SQtree tCopy(t);
 
+
   // render the sqtree
   PNG pic = t.render();
+    printf("w: %d, h: %d\n", orig.width(), orig.height());
+
 
   // write it out
   pic.writeToFile("images/out/small1TEST.png");

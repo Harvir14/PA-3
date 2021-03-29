@@ -59,6 +59,7 @@ SQtree::Node * SQtree::buildTree(stats & s, pair<int,int> & ul,
   double variability = s.getVar(ul, w, h);
   double maxVar;
   double maxVar2;
+  
 
   pair <int,int> splitPair = ul;
 
@@ -126,7 +127,6 @@ SQtree::Node * SQtree::buildTree(stats & s, pair<int,int> & ul,
     }
     // recursion stuff
 
-
     int splitx = splitPair.first;
     int splity = splitPair.second;
     
@@ -182,10 +182,10 @@ void SQtree::render(Node * currNode, PNG im) {
   if (currNode->NE != NULL){
       render(currNode->NE, im);
   }
-  if (currNode->NW != NULL){
+  if (currNode->SW != NULL){
       render(currNode->SW, im);
   }
-  if (currNode->NW != NULL){
+  if (currNode->SE != NULL){
       render(currNode->SE, im);
   }
 }
