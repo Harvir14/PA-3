@@ -11,8 +11,10 @@ int main() {
 
   // read in image
   PNG orig;
-  orig.readFromFile("images/orig/small1.png");
+  // orig.readFromFile("images/orig/small1.png");
   // orig.readFromFile("images/orig/small2.png");
+    orig.readFromFile("images/orig/pacman.png");
+
 
 
   /*
@@ -40,7 +42,7 @@ int main() {
 
 
   // write it out
-  pic.writeToFile("images/out/small1TEST.png");
+  pic.writeToFile("images/small1TEST.png");
 
   return 0;
 }

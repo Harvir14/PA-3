@@ -64,11 +64,11 @@ SQtree::Node * SQtree::buildTree(stats & s, pair<int,int> & ul,
   pair <int,int> splitPair = ul;
 
   // case where currNode has already achieved ideal variability
-  if (variability < tol) {
+  if (variability <= tol) {
     return currNode;
     }
   //case where currNode contains a 1x1 pixel, so no split is possible
-  if (w <= 1 && h <= 1) {
+  if (w == 1 && h == 1) {
     return currNode;
     }
 
@@ -83,7 +83,7 @@ SQtree::Node * SQtree::buildTree(stats & s, pair<int,int> & ul,
           if (i == 0) {
 
             double varN = s.getVar(ul, w, j);
-            double varS = s.getVar(make_pair(ul.first, ul.second + j), w, h-j );
+            double varS = s.getVar(make_pair(ul.first+i, ul.second + j), w, h-j );
 
             maxVar = max(varN, varS);
 
@@ -96,21 +96,21 @@ SQtree::Node * SQtree::buildTree(stats & s, pair<int,int> & ul,
 
             //case where there would be two children (left and right)
              if (j == 0) {
-            double varE = s.getVar(ul, i, h);
-            double varW = s.getVar(make_pair(ul.first + i, ul.second), w - i , h);
+            double varW = s.getVar(ul, i, h);
+            double varE = s.getVar(make_pair(ul.first + i, ul.second + j), w - i , h);
 
-            maxVar = max(varE, varW);
+            maxVar = max(varW, varE);
 
             if( maxVar < variability ) {
               variability = maxVar;
-              splitPair = make_pair(ul.first + i, ul.second + j);
+              splitPair = make_pair(i, j);
               }
             } else {
 
-              double varNE = s.getVar(ul, i, j);
-              double varNW = s.getVar(make_pair(ul.first + i, ul.second), w - i, j);
-              double varSE = s.getVar(make_pair(ul.first, ul.second + j), w, h - j);
-              double varSW = s.getVar(make_pair(ul.first + i, ul.second + j), w - i, h - j);
+              double varNW = s.getVar(ul, i, j);
+              double varNE = s.getVar(make_pair(ul.first + i, ul.second), w - i, j);
+              double varSW = s.getVar(make_pair(ul.first, ul.second + j), w, h - j);
+              double varSE = s.getVar(make_pair(ul.first + i, ul.second + j), w - i, h - j);
 
               maxVar = max(varNE, varNW);
               maxVar2 = max(varSE, varSW);
@@ -134,6 +134,9 @@ SQtree::Node * SQtree::buildTree(stats & s, pair<int,int> & ul,
     pair <int,int> SWpair = make_pair(ul.first, ul.second + splity);
     pair <int,int> SEpair = make_pair(ul.first + splitx, ul.second + splity);
 
+    if (splitx == 0 && splity == 0) {
+      return currNode;
+    }
 
     if (splitx == 0) {
       
@@ -152,6 +155,8 @@ SQtree::Node * SQtree::buildTree(stats & s, pair<int,int> & ul,
         currNode->SE = buildTree(s, SEpair, w - splitx, h-splity, tol);
       }
     }
+    // printf("x: %d y: %d\n", splitx, splity);
+
     return currNode;
   }
   
@@ -168,11 +173,16 @@ PNG SQtree::render() {
 
 // helper for render()
 void SQtree::render(Node * currNode, PNG im) {
-    if (currNode->NE==NULL && currNode->NW==NULL && currNode->SE==NULL && currNode->SW==NULL) {
+   
+    if ((currNode->NE==NULL && currNode->NW==NULL) && (currNode->SE==NULL && currNode->SW==NULL)) {
+
+      printf("x: %d y: %d\n", currNode->upLeft.first, currNode->upLeft.second);
+
       for (int i = 0; i < currNode->width; i++) {
         for(int j = 0; j < currNode->height; j++) {
           RGBAPixel* p = im.getPixel(currNode->upLeft.first + i, currNode->upLeft.second + j);
           *p = currNode->avg;
+          printf("r: %d g: %d b: %d \n", p->r, p->b, p->g);
       }
     }
   }
