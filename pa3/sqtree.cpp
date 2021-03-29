@@ -61,7 +61,6 @@ SQtree::Node * SQtree::buildTree(stats & s, pair<int,int> & ul,
   double maxVar2;
 
   pair <int,int> splitPair = ul;
-  return currNode;
 
   // case where currNode has already achieved ideal variability
   if (variability < tol) {
