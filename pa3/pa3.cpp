@@ -13,9 +13,9 @@ int main() {
   PNG orig;
   // orig.readFromFile("images/orig/small1.png");
   // orig.readFromFile("images/orig/small2.png");
-    // orig.readFromFile("images/orig/stanley-totem-poles.png");
+    orig.readFromFile("images/orig/stanley-totem-poles.png");
 
-    orig.readFromFile("images/orig/pacman.png");
+    // orig.readFromFile("images/orig/pacman.png");
 
 
 

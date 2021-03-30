@@ -167,41 +167,106 @@ SQtree::Node * SQtree::buildTree(stats & s, pair<int,int> & ul,
  * Render SQtree and return the resulting image.
  */
 PNG SQtree::render() {
-  
-    PNG renderImg = *(new PNG(root->width, root->height));
-    render(root, renderImg);
-    // printf("r: %d g: %d b: %d \n", renderImg.getPixel(5, 5)->r, renderImg.getPixel(5, 5)->b, renderImg.getPixel(5, 5)->g);
-  
-    return renderImg;
-}
 
-// helper for render()
-void SQtree::render(Node * currNode, PNG im) {
-   
-    if ((currNode->NE==NULL && currNode->NW==NULL) && (currNode->SE==NULL && currNode->SW==NULL)) {
+    // PNG renderimage = *(new PNG(root->width, root->height));
+    // renderimage = render(root, renderimage);
+    // return renderimage;
+
+  PNG im = *(new PNG(root->width, root->height));
+
+  queue<Node *> toRender;
+  toRender.push(root);
+
+   while(!toRender.empty()){
+      Node *currNode = toRender.front();
+      if ((currNode->NE==NULL && currNode->NW==NULL) && (currNode->SE==NULL && currNode->SW==NULL)) {
 
       // printf("x: %d y: %d\n", currNode->upLeft.first, currNode->upLeft.second);
 
-      for (int i = 0; i < currNode->width; i++) {
-        for(int j = 0; j < currNode->height; j++) {
-          RGBAPixel* p = im.getPixel(currNode->upLeft.first + i, currNode->upLeft.second + j);
-          *p = currNode->avg;
-          printf("r: %d g: %d b: %d \n", p->r, p->b, p->g);
+        for (int i = 0; i < currNode->width; i++) {
+          for(int j = 0; j < currNode->height; j++) {
+            *(im.getPixel(currNode->upLeft.first + i, currNode->upLeft.second + j)) = currNode->avg;
+            }
+          }
+        }
+        if (currNode->NW != NULL){
+          toRender.push(currNode->NW);
+        }
+        if (currNode->NE != NULL){
+          toRender.push(currNode->NE);
+        }
+        if (currNode->SW != NULL){
+          toRender.push(currNode->SW);
+        }
+        if (currNode->SE != NULL){
+          toRender.push(currNode->SE);
+        }
+        toRender.pop();
+        
       }
-    }
+      return im;
   }
-  if (currNode->NW != NULL){
-      render(currNode->NW, im);
-  }
-  if (currNode->NE != NULL){
-      render(currNode->NE, im);
-  }
-  if (currNode->SW != NULL){
-      render(currNode->SW, im);
-  }
-  if (currNode->SE != NULL){
-      render(currNode->SE, im);
-  }
+    // printf("r: %d g: %d b: %d \n", im.getPixel(5, 5)->r, renderImg.getPixel(5, 5)->b, renderImg.getPixel(5, 5)->g);
+  
+ 
+
+
+// helper for render()
+PNG SQtree::render(Node * root, PNG im) {
+
+  queue<Node *> toRender;
+  toRender.push(root);
+
+   while(!toRender.empty()){
+      Node *currNode = toRender.front();
+      if ((currNode->NE==NULL && currNode->NW==NULL) && (currNode->SE==NULL && currNode->SW==NULL)) {
+
+      // printf("x: %d y: %d\n", currNode->upLeft.first, currNode->upLeft.second);
+
+        for (int i = 0; i < currNode->width; i++) {
+          for(int j = 0; j < currNode->height; j++) {
+            *(im.getPixel(currNode->upLeft.first + i, currNode->upLeft.second + j)) = currNode->avg;
+            }
+          }
+        }
+        if (currNode->NW != NULL){
+          toRender.push(currNode->NW);
+        }
+        if (currNode->NE != NULL){
+          toRender.push(currNode->NE);
+        }
+        if (currNode->SW != NULL){
+          toRender.push(currNode->SW);
+        }
+        if (currNode->SE != NULL){
+          toRender.push(currNode->SE);
+        }
+        toRender.pop();
+        
+      }
+  return im;
+  //   if ((currNode->NE==NULL && currNode->NW==NULL) && (currNode->SE==NULL && currNode->SW==NULL)) {
+
+  //     // printf("x: %d y: %d\n", currNode->upLeft.first, currNode->upLeft.second);
+
+  //     for (int i = 0; i < currNode->width; i++) {
+  //       for(int j = 0; j < currNode->height; j++) {
+  //         *(im.getPixel(currNode->upLeft.first + i, currNode->upLeft.second + j)) = currNode->avg;
+  //     }
+  //   }
+  // }
+  // if (currNode->NW != NULL){
+  //     render(currNode->NW, im);
+  // }
+  // if (currNode->NE != NULL){
+  //     render(currNode->NE, im);
+  // }
+  // if (currNode->SW != NULL){
+  //     render(currNode->SW, im);
+  // }
+  // if (currNode->SE != NULL){
+  //     render(currNode->SE, im);
+  // }
   // printf("r: %d g: %d b: %d \n", im.getPixel(5, 5)->r, im.getPixel(5, 5)->b, im.getPixel(5, 5)->g);
 }
 
