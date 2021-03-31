@@ -1,0 +1,81 @@
+ Node* newN = new Node(s, ul, w, h);
+  
+  double minMaxVarVar = -1;
+  int minX;
+  int minY;
+
+  bool withinTol = false;
+
+  for (int y = 0; y < h && !withinTol; y++) {
+    for (int x = 0; x < w && !withinTol; x++) {
+      if (x == 0 && y == 0) {
+        continue;
+      }
+
+      double neVar = -1;
+      double nwVar = -1;
+      double seVar = -1;
+      double swVar = -1;
+
+      if (x == 0) {
+        nwVar = s.getVar(ul, w, y); 
+        pair<int,int> newUl(ul.first, ul.second + y);
+        swVar = s.getVar(newUl, w, h - y);
+      } else if (y == 0) {
+        nwVar = s.getVar(ul, x, h);
+        pair<int,int> newUl(ul.first + x, ul.second);
+        neVar = s.getVar(newUl, w - x, h);
+      } else {
+        nwVar = s.getVar(ul, x, y);
+
+        pair<int,int> newUl(ul.first + x, ul.second);
+        neVar = s.getVar(newUl, w - x, y);
+
+        pair<int,int> newUl1(ul.first, ul.second + y);
+        swVar = s.getVar(newUl1, x, h - y);
+
+        pair<int,int> newUl2(ul.first + x, ul.second + y);
+        seVar = s.getVar(newUl2, w - x, h - y);
+      }
+
+      double currMax = max(max(neVar, nwVar), max(seVar, swVar));
+
+      if (currMax >= tol) {
+        if (minMaxVarVar == -1 || minMaxVarVar > currMax) {
+          minMaxVarVar = currMax;
+          minX = x;
+          minY = y;
+        }
+      } else {
+        withinTol = true;
+      }
+    }
+  }
+  
+  if (!withinTol && minMaxVarVar != -1) { // Within tolerance
+    // split
+    if (minX == 0) {
+
+      newN->NW = buildTree(s, ul, w, minY, tol);
+      pair<int,int> newUl(ul.first, ul.second + minY);
+      newN->SW = buildTree(s, newUl, w, h - minY, tol);
+    } else if (minY == 0) {
+
+      newN->NW = buildTree(s, ul, minX, h, tol);
+      pair<int,int> newUl(ul.first + minX, ul.second);
+      newN->NE = buildTree(s, newUl, w - minX, h, tol);
+    } else {
+      newN->NW = buildTree(s, ul,minX, minY, tol);
+
+      pair<int,int> newUl(ul.first + minX, ul.second);
+      newN->NE = buildTree(s, newUl, w - minX, minY, tol);
+
+      pair<int,int> newUl1(ul.first, ul.second + minY);
+      newN->SW = buildTree(s, newUl1, minX, h - minY, tol);
+
+      pair<int,int> newUl2(ul.first + minX, ul.second + minY);
+      newN->SE = buildTree(s, newUl2, w - minX, h - minY, tol);
+    }
+  } 
+
+  return newN;

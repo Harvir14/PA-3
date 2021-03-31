@@ -195,7 +195,7 @@ class SQtree {
   Node* copy(const Node * other);
   void clear(Node * & curr); 
   int size(Node * & curr);
-  void render(Node * currNode, PNG im);
+  void renderHelper(Node * currNode, PNG &im);
   /* END ================ Your personal private functions ============= */
 
 };

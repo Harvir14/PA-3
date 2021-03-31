@@ -1,3 +1,4 @@
+
 /**
  *
  * shifty quadtree (pa3)
@@ -55,77 +56,74 @@ SQtree::SQtree(PNG & imIn, double tol) {
  */
 SQtree::Node * SQtree::buildTree(stats & s, pair<int,int> & ul,
 				 int w, int h, double tol) {
-  Node* currNode = new Node(ul, w, h, s.getAvg(ul, w, h), s.getVar(ul, w, h));
-  double variability = s.getVar(ul, w, h);
-  double maxVar;
-  double maxVar2;
+
+  Node* currNode = new Node(s, ul, w, h);
+  double variability = -1;
+  double maxVar, maxVar2;
+  double varNW, varNE, varSW, varSE;
+
+  
 
   pair <int,int> splitPair = ul;
 
   // case where currNode has already achieved ideal variability
-  if (variability < tol) {
-    return currNode;
-    }
+  // if (variability <= tol) {
+  //   return currNode;
+  //   }
   //case where currNode contains a 1x1 pixel, so no split is possible
-  if (w <= 1 && h <= 1) {
-    return currNode;
-    }
+  // if (w == 1 && h == 1) {
+  //   return currNode;
+  //   }
 
   for (int i = 0; i < w; i++) {
       for (int j = 0; j < h; j++) {
         // if there are no intersecting lines
         if(i == 0 && j == 0) {
           continue;
-        } else { 
+        } 
 
           //case where there would be two children (top and bottom)
           if (i == 0) {
 
-            double varN = s.getVar(ul, w, j);
-            double varS = s.getVar(make_pair(ul.first, ul.second + j), w, h-j );
+            varNW = s.getVar(ul, w, j);
+            varSW = s.getVar(make_pair(ul.first, ul.second + j), w, h-j );
 
-            maxVar = max(varN, varS);
+            maxVar = max(varNW, varSW);
 
-            if( maxVar < variability ) {
-              variability = maxVar;
-              splitPair = make_pair(i, j);
-            }
+          } else if (j == 0){
+
+            //case where there would be two children (left and right)
+            varNW = s.getVar(ul, i, h);
+            varNE = s.getVar(make_pair(ul.first + i, ul.second), w - i , h);
+
+            maxVar = max(varNW, varNE);
 
           } else {
 
-            //case where there would be two children (left and right)
-             if (j == 0) {
-            double varE = s.getVar(ul, i, h);
-            double varW = s.getVar(make_pair(ul.first + i, ul.second), w - i , h);
-
-            maxVar = max(varE, varW);
-
-            if( maxVar < variability ) {
-              variability = maxVar;
-              splitPair = make_pair(ul.first + i, ul.second + j);
-              }
-            } else {
-
-              double varNE = s.getVar(ul, i, j);
-              double varNW = s.getVar(make_pair(ul.first + i, ul.second), w - i, j);
-              double varSE = s.getVar(make_pair(ul.first, ul.second + j), w, h - j);
-              double varSW = s.getVar(make_pair(ul.first + i, ul.second + j), w - i, h - j);
+              varNW = s.getVar(ul, i, j);
+              varNE = s.getVar(make_pair(ul.first + i, ul.second), w - i, j);
+              varSW = s.getVar(make_pair(ul.first, ul.second + j), i, h - j);
+              varSE = s.getVar(make_pair(ul.first + i, ul.second + j), w - i, h - j);
 
               maxVar = max(varNE, varNW);
               maxVar2 = max(varSE, varSW);
               maxVar = max(maxVar, maxVar2);
 
-              if( maxVar < variability ) {
+          }
+
+            if( maxVar >= tol ) {
+              if (maxVar < variability) {
                 variability = maxVar;
                 splitPair = make_pair(i, j);
               }
             }
+            else {
+              return currNode;
+            }
           }
-        }
+        
       }
-    }
     // recursion stuff
-
 
     int splitx = splitPair.first;
     int splity = splitPair.second;
@@ -134,24 +132,27 @@ SQtree::Node * SQtree::buildTree(stats & s, pair<int,int> & ul,
     pair <int,int> SWpair = make_pair(ul.first, ul.second + splity);
     pair <int,int> SEpair = make_pair(ul.first + splitx, ul.second + splity);
 
+    if (splitx == 0 && splity == 0) {
+      return currNode;
+    }
 
     if (splitx == 0) {
       
       currNode->NW = buildTree(s, ul, w, splity, tol);
-      currNode->SE = buildTree(s, SEpair, w, h - splity, tol);
+      currNode->SW = buildTree(s, SWpair, w, h - splity, tol);
       
-    } else {
-      if (splity == 0) {
+    } else if (splity == 0){
         currNode->NW = buildTree(s, ul, splitx, h, tol);
-        currNode->SE = buildTree(s, SEpair, w - splitx, h, tol);
-
-      } else {
-        currNode->NW = buildTree(s, ul, splitx, splity, tol);
         currNode->NE = buildTree(s, NEpair, w - splitx, h, tol);
-        currNode->SW = buildTree(s, SWpair, w, h - splity, tol);
+
+    } else {
+        currNode->NW = buildTree(s, ul, splitx, splity, tol);
+        currNode->NE = buildTree(s, NEpair, w - splitx, splity, tol);
+        currNode->SW = buildTree(s, SWpair, splitx, h - splity, tol);
         currNode->SE = buildTree(s, SEpair, w - splitx, h-splity, tol);
       }
-    }
+    // printf("x: %d y: %d\n", splitx, splity);
+
     return currNode;
   }
   
@@ -161,33 +162,77 @@ SQtree::Node * SQtree::buildTree(stats & s, pair<int,int> & ul,
  * Render SQtree and return the resulting image.
  */
 PNG SQtree::render() {
-    PNG renderImg = *(new PNG(root->width, root->height));
-    render(root, renderImg);
-    return renderImg;
-}
+
+    // PNG renderimage = *(new PNG(root->width, root->height));
+    // renderimage = render(root, renderimage);
+    // return renderimage;
+
+  PNG im = *(new PNG(root->width, root->height));
+
+  renderHelper(root, im);
+
+  return im;
+
+  }
+    // printf("r: %d g: %d b: %d \n", im.getPixel(5, 5)->r, renderImg.getPixel(5, 5)->b, renderImg.getPixel(5, 5)->g);
+  
+ 
+
 
 // helper for render()
-void SQtree::render(Node * currNode, PNG im) {
-    if (currNode->NE==NULL && currNode->NW==NULL && currNode->SE==NULL && currNode->SW==NULL) {
-      for (int i = 0; i < currNode->width; i++) {
-        for(int j = 0; j < currNode->height; j++) {
-          RGBAPixel* p = im.getPixel(currNode->upLeft.first + i, currNode->upLeft.second + j);
-          *p = currNode->avg;
-      }
-    }
-  }
-  if (currNode->NW != NULL){
-      render(currNode->NW, im);
-  }
-  if (currNode->NE != NULL){
-      render(currNode->NE, im);
-  }
-  if (currNode->NW != NULL){
-      render(currNode->SW, im);
-  }
-  if (currNode->NW != NULL){
-      render(currNode->SE, im);
-  }
+void SQtree::renderHelper(Node * currNode, PNG &im) {
+
+  // queue<Node *> toRender;
+  // toRender.push(root);
+
+  //  while(!toRender.empty()){
+  //     Node *currNode = toRender.front();
+  //     if ((currNode->NE==NULL && currNode->NW==NULL) && (currNode->SE==NULL && currNode->SW==NULL)) {
+
+  //       for (int i = 0; i < currNode->width; i++) {
+  //         for(int j = 0; j < currNode->height; j++) {
+  //           *(im.getPixel(currNode->upLeft.first + i, currNode->upLeft.second + j)) = currNode->avg;
+  //           }
+  //         }
+  //       }
+  //       if (currNode->NW != NULL){
+  //         toRender.push(currNode->NW);
+  //       }
+  //       if (currNode->NE != NULL){
+  //         toRender.push(currNode->NE);
+  //       }
+  //       if (currNode->SW != NULL){
+  //         toRender.push(currNode->SW);
+  //       }
+  //       if (currNode->SE != NULL){
+  //         toRender.push(currNode->SE);
+  //       }
+  //       toRender.pop();
+        
+  //     }
+   if ((currNode->NE==NULL && currNode->NW==NULL) && (currNode->SE==NULL && currNode->SW==NULL)) {
+
+       for (int i = 0; i < currNode->width; i++) {
+         for(int j = 0; j < currNode->height; j++) {
+              int x = currNode->upLeft.first + i;
+              int y = currNode->upLeft.second + j;
+              RGBAPixel* currPixel = im.getPixel(x,y);
+              *currPixel = currNode->avg;
+       }
+     }
+   }
+   if (currNode->NW != NULL){
+     renderHelper(currNode->NW, im);
+   }
+   if (currNode->NE != NULL){
+       renderHelper(currNode->NE, im);
+   }
+   if (currNode->SW != NULL){
+       renderHelper(currNode->SW, im);
+   }
+   if (currNode->SE != NULL){
+       renderHelper(currNode->SE, im);
+   }
 }
 
 /**
@@ -262,4 +307,3 @@ int SQtree::size(Node * & curr) {
     }
     return val;
   }
-
