@@ -56,16 +56,17 @@ SQtree::SQtree(PNG & imIn, double tol) {
 SQtree::Node * SQtree::buildTree(stats & s, pair<int,int> & ul,
 				 int w, int h, double tol) {
 
-  Node* currNode = new Node(ul, w, h, s.getAvg(ul, w, h), s.getVar(ul, w, h));
+Node* currNode = new Node(s, ul, w, h);
   double variability = s.getVar(ul, w, h);
+  double minMaxVar = -1;
   double maxVar;
-  double maxVar2;
   
+  bool isTol = false;
 
-  pair <int,int> splitPair = ul;
+  pair <int,int> splitPair = make_pair(0, 0);
 
   // case where currNode has already achieved ideal variability
-  if (variability <= tol) {
+  if (variability < tol) {
     return currNode;
     }
   //case where currNode contains a 1x1 pixel, so no split is possible
@@ -73,92 +74,87 @@ SQtree::Node * SQtree::buildTree(stats & s, pair<int,int> & ul,
     return currNode;
     }
 
-  for (int i = 0; i < w; i++) {
-      for (int j = 0; j < h; j++) {
+  for (int i = 0; i < w && !isTol; i++) {
+      for (int j = 0; j < h && !isTol; j++) {
+
+        
         // if there are no intersecting lines
         if(i == 0 && j == 0) {
           continue;
-        } else { 
+        } 
 
+        if (i == 0) { 
           //case where there would be two children (top and bottom)
-          if (i == 0) {
-
             double varN = s.getVar(ul, w, j);
-            double varS = s.getVar(make_pair(ul.first+i, ul.second + j), w, h-j );
+            double varS = s.getVar(make_pair(ul.first, ul.second + j), w, h-j );
 
             maxVar = max(varN, varS);
 
-            if( maxVar < variability ) {
-              variability = maxVar;
-              splitPair = make_pair(i, j);
-            }
 
-          } else {
-
+          } else if (j == 0){
             //case where there would be two children (left and right)
-             if (j == 0) {
             double varW = s.getVar(ul, i, h);
-            double varE = s.getVar(make_pair(ul.first + i, ul.second + j), w - i , h);
+            double varE = s.getVar(make_pair(ul.first + i, ul.second), w - i , h);
 
             maxVar = max(varW, varE);
 
-            if( maxVar < variability ) {
-              variability = maxVar;
-              splitPair = make_pair(i, j);
-              }
             } else {
-
               double varNW = s.getVar(ul, i, j);
               double varNE = s.getVar(make_pair(ul.first + i, ul.second), w - i, j);
-              double varSW = s.getVar(make_pair(ul.first, ul.second + j), w, h - j);
+              double varSW = s.getVar(make_pair(ul.first, ul.second + j), i, h - j);
               double varSE = s.getVar(make_pair(ul.first + i, ul.second + j), w - i, h - j);
 
-              maxVar = max(varNE, varNW);
-              maxVar2 = max(varSE, varSW);
-              maxVar = max(maxVar, maxVar2);
-
-              if( maxVar < variability ) {
-                variability = maxVar;
-                splitPair = make_pair(i, j);
-              }
+              maxVar = max(max(varNE, varNW), max(varSE, varSW));
             }
-          }
-        }
+
+          if (maxVar >= tol) {
+            if(maxVar < minMaxVar || minMaxVar == -1) {
+                minMaxVar = maxVar;
+                splitPair = make_pair(i, j);
+            }
+          } else isTol = true;
+        
       }
     }
-    // recursion stuff
-
-    int splitx = splitPair.first;
-    int splity = splitPair.second;
     
-    pair <int,int> NEpair = make_pair(ul.first + splitx, ul.second);
-    pair <int,int> SWpair = make_pair(ul.first, ul.second + splity);
-    pair <int,int> SEpair = make_pair(ul.first + splitx, ul.second + splity);
-
-    if (splitx == 0 && splity == 0) {
-      return currNode;
-    }
-
-    if (splitx == 0) {
+    // recursion stuff
+  if (minMaxVar != -1 && !isTol) {
+      int splitx = splitPair.first;
+      int splity = splitPair.second;
       
-      currNode->NW = buildTree(s, ul, w, splity, tol);
-      currNode->SE = buildTree(s, SEpair, w, h - splity, tol);
-      
-    } else {
-      if (splity == 0) {
+      pair <int,int> NEpair = make_pair(ul.first + splitx, ul.second);
+      pair <int,int> SWpair = make_pair(ul.first, ul.second + splity);
+      pair <int,int> SEpair = make_pair(ul.first + splitx, ul.second + splity);
+
+      if (splitx == 0 && splity == 0) {
+        return currNode;
+      }
+
+      if (splitx == 0) {
+        
+        currNode->NW = buildTree(s, ul, w, splity, tol);
+        currNode->SE = buildTree(s, SEpair, w, h - splity, tol);
+        
+      } else if (splity == 0) {
         currNode->NW = buildTree(s, ul, splitx, h, tol);
         currNode->SE = buildTree(s, SEpair, w - splitx, h, tol);
 
       } else {
         currNode->NW = buildTree(s, ul, splitx, splity, tol);
-        currNode->NE = buildTree(s, NEpair, w - splitx, h, tol);
-        currNode->SW = buildTree(s, SWpair, w, h - splity, tol);
+        currNode->NE = buildTree(s, NEpair, w - splitx, splity, tol);
+        currNode->SW = buildTree(s, SWpair, splitx, h - splity, tol);
         currNode->SE = buildTree(s, SEpair, w - splitx, h-splity, tol);
-      }
+    
+      
     }
+  }
     // printf("x: %d y: %d\n", splitx, splity);
 
     return currNode;
+
+
+
+
   }
   
   
