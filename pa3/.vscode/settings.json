@@ -2,6 +2,10 @@
     "files.associations": {
         "utility": "cpp",
         "memory": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "chrono": "cpp",
+        "limits": "cpp",
+        "valarray": "cpp",
+        "algorithm": "cpp"
     }
 }
