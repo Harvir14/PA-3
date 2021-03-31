@@ -233,6 +233,7 @@ void SQtree::renderHelper(Node * currNode, PNG &im) {
    if (currNode->SE != NULL){
        renderHelper(currNode->SE, im);
    }
+   return;
 }
 
 /**
